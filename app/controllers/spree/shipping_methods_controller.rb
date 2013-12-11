@@ -18,8 +18,8 @@ module Spree
         current_order.ship_address.country_id = params['country_id']
         Float(params['state']) != nil rescue false ? current_order.ship_address.state_id = params['state'] : current_order.ship_address.state_name = params['state']
         current_order.save(:validate => false)
-        current_order.rate_hash.each { |rh| rh.cost = Money.new(rh.cost, { :currency => rh.currency}).to_s }
-        render :json => current_order.rate_hash
+
+        render :json => current_order.create_proposed_shipments
       else
         render :json => nil
       end

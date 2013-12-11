@@ -5,7 +5,7 @@ Spree::OrdersController.class_eval do
     associate_user
     @order.bill_address ||= Spree::Address.default
     @order.ship_address ||= Spree::Address.default
-    # before_delivery
+    before_delivery
     @order.payments.destroy_all if request.put?
   end
 
@@ -23,7 +23,9 @@ Spree::OrdersController.class_eval do
   private
     def before_delivery
       return if params[:order].present?
-      @order.shipping_method ||= (@order.rate_hash.first && @order.rate_hash.first[:shipping_method])
+
+      packages = @order.shipments.map { |s| s.to_package }
+      @differentiator = Spree::Stock::Differentiator.new(@order, packages)
     end
 
 end
